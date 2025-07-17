@@ -8,7 +8,7 @@ This repository contains the code to start a GitHub Actions runner on an AWS EC2
 | aws_image_id          | The machine AMI to use for your runner. This AMI can be a default but should have docker installed in the AMI.     | true               |         |
 | aws_instance_type     | The type of instance to use for your runner. For example: t2.micro, t4g.nano, etc. Will not start if not specified.| true               |         |
 | aws_region_name       | The AWS region name to use for your runner. Defaults to AWS_REGION                                                 | true               |         |
-| aws_root_device_size  | The root device size in GB to use for your runner.                                                                 | false              | The AMI default root disk size | 
+| aws_root_device_size  | The root device size in GB to use for your runner.                                                                 | false              | The AMI default root disk size |
 | aws_security_group_id | The AWS security group ID to use for your runner. Will use the account default security group if not specified.    | false              | The default AWS security group |
 | aws_subnet_id         | The AWS subnet ID to use for your runner. Will use the account default subnet if not specified.                    | false              | The default AWS subnet ID |
 | aws_tags              | The AWS tags to use for your runner, formatted as a JSON list. See `README` for more details.                      | false              |         |
@@ -16,6 +16,7 @@ This repository contains the code to start a GitHub Actions runner on an AWS EC2
 | instance_count        | The number of instances to create, defaults to 1                                                                   | false              | 1       |
 | repo     | The repo to run against. Will use the current repo if not specified.       | false    | The repo the runner is running in |
 | gh_timeout            | The timeout in seconds to wait for the runner to come online as seen by the GitHub API. Defaults to 1200 seconds.  | false              | 1200    |
+| aws_userdata          | User data script to run on instance startup. Use this to configure the instance before the runner starts.          | false              |         |
 ## Outputs
 | Name | Description |
 | ---- | ----------- |
@@ -50,4 +51,25 @@ jobs:
           aws_home_dir: /home/ubuntu
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
+```
+
+### Example with User Data
+
+```yaml
+- name: Create self-terminating runner
+  id: aws-start
+  uses: omsf/start-aws-gha-runner@v1.0.0
+  with:
+    aws_image_id: ami-0f7c4a792e3fb63c8
+    aws_instance_type: g4dn.xlarge
+    aws_home_dir: /home/ubuntu
+    aws_userdata: |
+      #!/bin/bash
+      # Configure instance to terminate on shutdown
+      INSTANCE_ID=$(ec2-metadata --instance-id | cut -d " " -f 2)
+      aws ec2 modify-instance-attribute \
+        --instance-id $INSTANCE_ID \
+        --instance-initiated-shutdown-behavior terminate
+  env:
+    GH_PAT: ${{ secrets.GH_PAT }}
 ```
