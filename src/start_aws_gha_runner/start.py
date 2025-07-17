@@ -45,6 +45,8 @@ class StartAWS(CreateCloudInstance):
         The script to run on the instance. Defaults to an empty string.
     userdata : str
         Custom user data script to prepend to the runner setup. Defaults to an empty string.
+    key_name : str
+        The name of the EC2 key pair to use for SSH access. Defaults to an empty string.
 
     """
 
@@ -63,6 +65,7 @@ class StartAWS(CreateCloudInstance):
     iam_role: str = ""
     script: str = ""
     userdata: str = ""
+    key_name: str = ""
 
     def _build_aws_params(self, user_data_params: dict) -> dict:
         """Build the parameters for the AWS API call.
@@ -92,6 +95,8 @@ class StartAWS(CreateCloudInstance):
             params["SecurityGroupIds"] = [self.security_group_id]
         if self.iam_role != "":
             params["IamInstanceProfile"] = {"Name": self.iam_role}
+        if self.key_name != "":
+            params["KeyName"] = self.key_name
         if len(self.tags) > 0:
             specs = {"ResourceType": "instance", "Tags": self.tags}
             params["TagSpecifications"] = [specs]

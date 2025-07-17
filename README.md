@@ -17,6 +17,7 @@ This repository contains the code to start a GitHub Actions runner on an AWS EC2
 | repo     | The repo to run against. Will use the current repo if not specified.       | false    | The repo the runner is running in |
 | gh_timeout            | The timeout in seconds to wait for the runner to come online as seen by the GitHub API. Defaults to 1200 seconds.  | false              | 1200    |
 | aws_userdata          | User data script to run on instance startup. Use this to configure the instance before the runner starts.          | false              |         |
+| aws_key_name          | Name of the EC2 key pair to use for SSH access.                                                                   | false              |         |
 ## Outputs
 | Name | Description |
 | ---- | ----------- |
