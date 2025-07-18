@@ -1,10 +1,18 @@
 #!/bin/bash
+set -e
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] GitHub runner setup starting"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Working directory: $homedir"
 cd "$homedir"
 echo "$script" > pre-runner-script.sh
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running pre-runner script"
 source pre-runner-script.sh
 export RUNNER_ALLOW_RUNASROOT=1
 # We will get the latest release from the GitHub API
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Downloading runner from: $runner_release"
 curl -L $runner_release -o runner.tar.gz
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Extracting runner"
 tar xzf runner.tar.gz
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Configuring runner for repo: $repo with labels: $labels"
 ./config.sh --url https://github.com/$repo --token $token --labels $labels --ephemeral
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting runner"
 ./run.sh
